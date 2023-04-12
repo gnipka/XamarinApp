@@ -1,8 +1,4 @@
-﻿using Android.App;
-using Android.Content;
-using Android;
-using Newtonsoft.Json;
-using System;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.Http;
@@ -11,7 +7,6 @@ using System.Threading.Tasks;
 using System.Xml;
 using Xamarin.Forms;
 using XamarinApp.Models;
-using static Android.Icu.Text.CaseMap;
 
 namespace XamarinApp
 {

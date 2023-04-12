@@ -1,8 +1,7 @@
-﻿using Xamarin.Forms;
+﻿using Xam.Forms.Markdown;
+using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 using XamarinApp.Models;
-using Xam.Forms.Markdown;
-using System.Text;
 
 namespace XamarinApp
 {
