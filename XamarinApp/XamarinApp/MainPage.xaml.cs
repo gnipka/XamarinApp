@@ -8,7 +8,7 @@ namespace XamarinApp
         public MainPage()
         {
             InitializeComponent();
-            viewModel = new MainViewModel() { Navigation = this.Navigation };
+            viewModel = new MainViewModel(this) { Navigation = this.Navigation };
             this.BindingContext = viewModel;
         }
 

@@ -1,4 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using Android.App;
+using Android.Content;
+using Android;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Net.Http;
@@ -7,6 +11,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using Xamarin.Forms;
 using XamarinApp.Models;
+using static Android.Icu.Text.CaseMap;
 
 namespace XamarinApp
 {
@@ -14,6 +19,12 @@ namespace XamarinApp
     {
         public event PropertyChangedEventHandler PropertyChanged;
         public INavigation Navigation { get; set; }
+        private Page _page;
+
+        public MainViewModel(Page page) 
+        {
+            _page = page;
+        }
 
         protected void OnPropertyChanged(string propName)
         {
@@ -47,25 +58,32 @@ namespace XamarinApp
 
         public async Task GetOffers()
         {
-            HttpClient httpClient = new HttpClient();
-            var answer = await httpClient.GetAsync("http://partner.market.yandex.ru/pages/help/YML.xml");
-            //var response = await answer.Content.ReadAsStringAsync();
-            var response = await answer.Content.ReadAsByteArrayAsync();
-            XmlDocument xDoc = new XmlDocument();
-            var responseStr = Encoding.GetEncoding(1251).GetString(response);
-            xDoc.LoadXml(responseStr);
-            var xNodeOffer = xDoc.DocumentElement.SelectSingleNode("shop").SelectSingleNode("offers");
-
-            var list = new List<Offer>();
-
-            foreach (XmlNode node in xNodeOffer)
+            try
             {
-                string jsonText = JsonConvert.SerializeXmlNode(node, Newtonsoft.Json.Formatting.Indented);
+                HttpClient httpClient = new HttpClient();
+                var answer = await httpClient.GetAsync("http://partner.market.yandex.ru/pages/help/YML.xml");
+                answer.EnsureSuccessStatusCode();
+                var response = await answer.Content.ReadAsByteArrayAsync();
+                XmlDocument xDoc = new XmlDocument();
+                var responseStr = Encoding.GetEncoding(1251).GetString(response);
+                xDoc.LoadXml(responseStr);
+                var xNodeOffer = xDoc.DocumentElement.SelectSingleNode("shop").SelectSingleNode("offers");
 
-                list.Add(new Offer { Id = node.Attributes.GetNamedItem("id").Value, JsonConent = jsonText });
+                var list = new List<Offer>();
+
+                foreach (XmlNode node in xNodeOffer)
+                {
+                    string jsonText = JsonConvert.SerializeXmlNode(node, Newtonsoft.Json.Formatting.Indented);
+
+                    list.Add(new Offer { Id = node.Attributes.GetNamedItem("id").Value, JsonConent = jsonText });
+                }
+
+                Offers = list;
             }
-
-            Offers = list;
+            catch(HttpRequestException)
+            {
+                _page.DisplayAlert("Error", "No response from the server", "Ok");
+            }
         }
 
         private async void OpenOffer()

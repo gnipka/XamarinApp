@@ -13,7 +13,7 @@
                     <ViewCell>
                         <ViewCell.View>
                             <StackLayout>
-                                <Label Text="{Binding Id}"/>
+                                <Label Text="{Binding Id}" FontSize="Title" LineBreakMode="MiddleTruncation" Margin="10"/>
                             </StackLayout>
                         </ViewCell.View>
                     </ViewCell>
