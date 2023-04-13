@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
@@ -53,32 +54,41 @@ namespace XamarinApp
 
         public async Task GetOffers()
         {
-            try
-            {
-                HttpClient httpClient = new HttpClient();
-                var answer = await httpClient.GetAsync("http://partner.market.yandex.ru/pages/help/YML.xml");
-                answer.EnsureSuccessStatusCode();
-                var response = await answer.Content.ReadAsByteArrayAsync();
-                XmlDocument xDoc = new XmlDocument();
-                var responseStr = Encoding.GetEncoding(1251).GetString(response);
-                xDoc.LoadXml(responseStr);
-                var xNodeOffer = xDoc.DocumentElement.SelectSingleNode("shop").SelectSingleNode("offers");
+            //try
+            //{
+            //    HttpClient httpClient = new HttpClient();
+            //    var answer = await httpClient.GetAsync("http://partner.market.yandex.ru/pages/help/YML.xml");
+            //    answer.EnsureSuccessStatusCode();
+            //    var response = await answer.Content.ReadAsByteArrayAsync();
+            //    XmlDocument xDoc = new XmlDocument();
+            //    var responseStr = Encoding.GetEncoding(1251).GetString(response);
+            //    xDoc.LoadXml(responseStr);
+            //    var xNodeOffer = xDoc.DocumentElement.SelectSingleNode("shop").SelectSingleNode("offers");
 
-                var list = new List<Offer>();
+            //    var list = new List<Offer>();
 
-                foreach (XmlNode node in xNodeOffer)
-                {
-                    string jsonText = JsonConvert.SerializeXmlNode(node, Newtonsoft.Json.Formatting.Indented);
+            //    foreach (XmlNode node in xNodeOffer)
+            //    {
+            //        string jsonText = JsonConvert.SerializeXmlNode(node, Newtonsoft.Json.Formatting.Indented);
 
-                    list.Add(new Offer { Id = node.Attributes.GetNamedItem("id").Value, JsonConent = jsonText });
-                }
+            //        list.Add(new Offer { Id = node.Attributes.GetNamedItem("id").Value, JsonConent = jsonText });
+            //    }
 
-                Offers = list;
-            }
-            catch(HttpRequestException)
-            {
-                _page.DisplayAlert("Error", "No response from the server", "Ok");
-            }
+            //    Offers = list;
+            //}
+            //catch(HttpRequestException)
+            //{
+            //    _page.DisplayAlert("Error", "No response from the server", "Ok");
+            //}
+
+            IEnumerable<Offer> offers = await OfferService.Get();
+
+            while (Offers.Any())
+                Offers.RemoveAt(Offers.Count - 1);
+
+            // добавляем загруженные данные
+            foreach (Offer f in offers)
+                Offers.Add(f);
         }
 
         private async void OpenOffer()
